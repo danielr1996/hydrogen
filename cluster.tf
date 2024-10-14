@@ -83,5 +83,13 @@ resource "terraform_data" "cluster" {
     EOF
     interpreter = ["bash", "-c"]
   }
+}
 
+data "local_sensitive_file" "kubeconfig" {
+  filename = "kubeconfig"
+}
+
+output "kubeconfig" {
+  value = data.local_sensitive_file.kubeconfig.content
+  sensitive = true
 }

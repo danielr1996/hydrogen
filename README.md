@@ -1,10 +1,6 @@
 # Initialize a cluster
 
 ```shell
-INSTANCE=prod
-WORKDIR="../hydrogen-instances/$INSTANCE"
-cd $WORKDIR
-source .envrc
 cat > main.tf <<EOF
 module "cluster" {
   source = "github.com/danielr1996/hydrogen"
@@ -28,12 +24,16 @@ output "k0sctl" {
   sensitive = false
   value = module.cluster.k0sctl
 }
+
+output "kubeconfig" {
+  sensitive = true
+  value     = module.cluster.kubeconfig
+}
 EOF
-tofu init
 ```
 
 ```shell
+tofu init
 tofu apply -auto-approve
-k0sctl apply
-k0sctl kubeconfig > ~/.kube/$NAME
+tofu output --raw kubeconfig > $KUBECONFIG
 ```
