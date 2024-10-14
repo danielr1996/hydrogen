@@ -1,14 +1,9 @@
-variable "cluster" {
-  type = object({
-    name = string
-  })
-}
 output "k0sctl" {
   value = yamlencode({
     apiVersion = "k0sctl.k0sproject.io/v1beta1"
     kind       = "Cluster"
     metadata = {
-      name = var.cluster.name
+      name = var.values.cluster.name
     }
     spec = {
       hosts = [

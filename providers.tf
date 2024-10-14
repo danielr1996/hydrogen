@@ -11,13 +11,6 @@ terraform {
   }
 }
 
-variable "hcloud" {
-  type = object({
-    k8stoken = string
-    tofutoken = string
-  })
-}
-
 provider "hcloud" {
-  token = var.hcloud.tofutoken
+  token = var.values.hcloud.tofutoken
 }
