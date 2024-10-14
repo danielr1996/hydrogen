@@ -1,5 +1,5 @@
-output "k0sctl" {
-  value = yamlencode({
+locals{
+  k0sctl = yamlencode({
     apiVersion = "k0sctl.k0sproject.io/v1beta1"
     kind       = "Cluster"
     metadata = {
@@ -17,7 +17,7 @@ output "k0sctl" {
             address = hcloud_server.single.ipv4_address,
             user    = "root",
             port    = 22,
-            keyPath = "default",
+            keyPath = local.privatekeytemp,
           }
         }
       ],
@@ -51,4 +51,20 @@ output "k0sctl" {
       }
     }
   })
+}
+
+output "k0sctl" {
+  value = local.k0sctl
+}
+
+resource "local_sensitive_file" "sshkey" {
+  count = var.values.cluster.writefiles ? 1 : 0
+  content  = tls_private_key.sshkey.private_key_openssh
+  filename = local.privatekeytemp
+}
+
+resource "local_sensitive_file" "k0sctl" {
+  count = var.values.cluster.writefiles ? 1 : 0
+  content  = local.k0sctl
+  filename = "k0sctl.yaml"
 }

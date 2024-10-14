@@ -1,7 +1,7 @@
 # Initialize a cluster
 
 ```shell
-INSTANCE=dev
+INSTANCE=prod
 WORKDIR="../hydrogen-instances/$INSTANCE"
 cd $WORKDIR
 source .envrc
@@ -20,13 +20,13 @@ module "cluster" {
 }
 
 output "sshkey" {
-sensitive = true
-value = module.cluster.sshkey
+  sensitive = true
+  value = module.cluster.sshkey
 }
 
 output "k0sctl" {
-sensitive = false
-value = module.cluster.k0sctl
+  sensitive = false
+  value = module.cluster.k0sctl
 }
 EOF
 tofu init
@@ -34,15 +34,6 @@ tofu init
 
 ```shell
 tofu apply -auto-approve
-```
-
-```shell
-tofu output --raw k0sctl > k0sctl.yaml 
-tofu output --raw sshkey > default 
-chmod 0600 default
-```
-
-```shell
 k0sctl apply
-k0sctl kubeconfig > ~/.kube/my-cluster
+k0sctl kubeconfig > ~/.kube/$NAME
 ```
