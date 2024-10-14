@@ -63,8 +63,25 @@ resource "local_sensitive_file" "sshkey" {
   filename = local.privatekeytemp
 }
 
-resource "local_sensitive_file" "k0sctl" {
+resource "local_file" "k0sctl" {
   count = var.values.cluster.writefiles ? 1 : 0
   content  = local.k0sctl
   filename = "k0sctl.yaml"
+}
+
+resource "terraform_data" "cluster" {
+  triggers_replace = local.k0sctl
+  depends_on = [local_sensitive_file.sshkey, local_file.k0sctl]
+  provisioner "local-exec" {
+    command     = <<-EOF
+      %{ for ip in  [hcloud_server.single.ipv4_address]}
+      ssh-keygen -R ${ip}
+      ssh-keyscan -H ${ip} >> $HOME/.ssh/known_hosts
+      %{ endfor }
+      k0sctl apply
+      k0sctl kubeconfig > kubeconfig
+    EOF
+    interpreter = ["bash", "-c"]
+  }
+
 }
