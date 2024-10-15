@@ -53,9 +53,9 @@ locals{
   })
 }
 
-output "k0sctl" {
-  value = local.k0sctl
-}
+#output "k0sctl" {
+#  value = local.k0sctl
+#}
 
 resource "local_sensitive_file" "sshkey" {
   count = var.values.cluster.writefiles ? 1 : 0
@@ -79,17 +79,16 @@ resource "terraform_data" "cluster" {
       ssh-keyscan -H ${ip} >> $HOME/.ssh/known_hosts
       %{ endfor }
       k0sctl apply
-      k0sctl kubeconfig > kubeconfig
     EOF
     interpreter = ["bash", "-c"]
   }
 }
 
-data "local_sensitive_file" "kubeconfig" {
-  filename = "kubeconfig"
+output "kubeconfig" {
+  value = base64decode(data.external.kubeconfig.result.kubeconfig)
+  sensitive = false
 }
 
-output "kubeconfig" {
-  value = data.local_sensitive_file.kubeconfig.content
-  sensitive = true
+data "external" "kubeconfig" {
+  program = ["bash", "${path.module}/bootstrap_k0s.sh"]
 }
