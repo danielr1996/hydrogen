@@ -88,5 +88,6 @@ output "kubeconfig" {
 }
 
 data "external" "kubeconfig" {
+  depends_on = [terraform_data.cluster, local_sensitive_file.sshkey, local_file.k0sctl]
   program = ["bash", "${path.module}/bootstrap_k0s.sh"]
 }
