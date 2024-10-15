@@ -78,7 +78,7 @@ resource "terraform_data" "cluster" {
       %{ endfor }
       k0sctl apply
     EOF
-    interpreter = ["bash", "-c"]
+    interpreter = ["sh", "-c"]
   }
 }
 
@@ -89,5 +89,5 @@ output "kubeconfig" {
 
 data "external" "kubeconfig" {
   depends_on = [terraform_data.cluster, local_sensitive_file.sshkey, local_file.k0sctl]
-  program = ["bash", "${path.module}/bootstrap_k0s.sh"]
+  program = ["sh", "${path.module}/bootstrap_k0s.sh"]
 }

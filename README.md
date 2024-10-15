@@ -34,6 +34,6 @@ EOF
 
 ```shell
 tofu init
-tofu apply -auto-approve
+tofu apply
 tofu output --raw kubeconfig > $KUBECONFIG
 ```

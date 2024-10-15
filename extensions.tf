@@ -24,7 +24,13 @@ locals {
           chartname = "tf-controller/tf-controller"
           version   = "0.15.1"
           namespace = "flux-system"
-          values    = ""
+          values    = <<EOF
+            allowBreakTheGlass: true
+            runner:
+              image:
+                repository: ghcr.io/danielr1996/tf-k0sctl
+                tag: latest
+          EOF
         }
       ]
     }
