@@ -86,7 +86,7 @@ resource "terraform_data" "cluster" {
 
 output "kubeconfig" {
   value = base64decode(data.external.kubeconfig.result.kubeconfig)
-  sensitive = false
+  sensitive = true
 }
 
 data "external" "kubeconfig" {
