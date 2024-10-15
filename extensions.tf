@@ -29,7 +29,7 @@ locals {
             runner:
               image:
                 repository: ghcr.io/danielr1996/tf-k0sctl
-                tag: latest
+                tag: 0.1.0
           EOF
         }
       ]
