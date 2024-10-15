@@ -58,13 +58,11 @@ locals{
 #}
 
 resource "local_sensitive_file" "sshkey" {
-  count = var.values.cluster.writefiles ? 1 : 0
   content  = tls_private_key.sshkey.private_key_openssh
   filename = local.privatekeytemp
 }
 
 resource "local_file" "k0sctl" {
-  count = var.values.cluster.writefiles ? 1 : 0
   content  = local.k0sctl
   filename = "k0sctl.yaml"
 }
