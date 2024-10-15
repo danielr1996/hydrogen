@@ -26,10 +26,6 @@ locals {
           namespace = "flux-system"
           values    = <<EOF
             allowBreakTheGlass: true
-            runner:
-              image:
-                repository: ghcr.io/danielr1996/tf-k0sctl
-                tag: 0.1.1
           EOF
         }
       ]
