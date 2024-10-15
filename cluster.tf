@@ -72,10 +72,12 @@ resource "terraform_data" "cluster" {
   depends_on = [local_sensitive_file.sshkey, local_file.k0sctl]
   provisioner "local-exec" {
     command     = <<-EOF
+      %{ if var.values.hack.updateknownhosts}
       %{ for ip in  [hcloud_server.single.ipv4_address]}
       ssh-keygen -R ${ip}
       ssh-keyscan -H ${ip} >> $HOME/.ssh/known_hosts
       %{ endfor }
+      %{ endif }
       k0sctl apply
     EOF
     interpreter = ["sh", "-c"]

@@ -7,6 +7,9 @@ variable "values" {
       k8stoken = string
       tofutoken = string
     })
+    hack = object({
+      updateknownhosts = bool
+    })
   })
 }
 
