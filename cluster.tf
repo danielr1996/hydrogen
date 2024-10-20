@@ -1,3 +1,5 @@
+# TODO: implement a proper provider to better managed update and delete
+
 locals {
   k0sctl = yamlencode({
     apiVersion = "k0sctl.k0sproject.io/v1beta1"
@@ -8,6 +10,7 @@ locals {
     spec = {
       hosts = [for host in local.nodes : {
         role         = host.role
+        noTaints = host.noTaints
         installFlags = [
           "--enable-cloud-provider",
           "--kubelet-extra-args=--cloud-provider=external",

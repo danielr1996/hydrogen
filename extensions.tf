@@ -47,7 +47,7 @@ locals {
           values    = <<EOF
             name: hcloud
             values:
-              token: ${var.values.hcloud.k8stoken}
+              token: ${var.values.hcloud.token}
           EOF
         },
         {

@@ -9,8 +9,7 @@ variable "values" {
       }))
     })
     hcloud = object({
-      k8stoken = string
-      tofutoken = string
+      token = string
     })
   })
 }
