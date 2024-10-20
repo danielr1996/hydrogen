@@ -10,7 +10,7 @@ locals {
     spec = {
       hosts = [for host in local.nodes : {
         role         = host.role
-        noTaints = host.noTaints
+#        noTaints = host.noTaints
         installFlags = [
           "--enable-cloud-provider",
           "--kubelet-extra-args=--cloud-provider=external",

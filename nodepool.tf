@@ -5,7 +5,7 @@ locals {
         role     = v.role
         name     = "${k}-${idx}"
         flavour  = v.flavour
-        noTaints = true
+#        noTaints = true
         location = "nbg1"
         image    = "ubuntu-24.04"
       }
