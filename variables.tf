@@ -11,6 +11,13 @@ variable "values" {
     hcloud = object({
       token = string
     })
+    flux = object({
+      username = string
+      password = string
+      url = string
+      branch = string
+      path = string
+    })
   })
 }
 

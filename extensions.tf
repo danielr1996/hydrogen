@@ -20,6 +20,27 @@ locals {
           values    = ""
         },
         {
+          name      = "flux2-sync"
+          chartname = "fluxcd-community/flux2-sync"
+          version   = "1.10.0"
+          namespace = "flux-system"
+          values    = <<EOF
+                      secret:
+                        create: true
+                        data:
+                          username: ${var.values.flux.username}
+                          password: ${var.values.flux.password}
+                      gitRepository:
+                        spec:
+                          url: ${var.values.flux.url}
+                          ref:
+                            branch: ${var.values.flux.branch}
+                      kustomization:
+                        spec:
+                          path: ${var.values.flux.path}
+          EOF
+        },
+        {
           name      = "tf-controller"
           chartname = "tf-controller/tf-controller"
           version   = "0.15.1"
