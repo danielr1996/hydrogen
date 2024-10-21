@@ -28,9 +28,11 @@ locals {
           spec = {
             network = {
               provider  = "calico"
-              kubeProxy = {
-                mode = "ipvs"
-              }
+              # TODO: loadbalancer does not work with ipvs, the workaround (https://github.com/hetznercloud/hcloud-cloud-controller-manager/issues/212)
+              # TODO: causes an infinite loop, because the load balancer is set to the dns name, so the external dns entry references itself
+#              kubeProxy = {
+#                mode = "ipvs"
+#              }
             }
             api = {
               #              externalAddress = hcloud_load_balancer.controller.ipv4,
