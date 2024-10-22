@@ -1,0 +1,33 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-dns
+  namespace: flux-system
+spec:
+  interval: 10m
+  timeout: 5m
+  chart:
+    spec:
+      chart: bitnamicharts/external-dns
+      # TODO: magicvar(version)
+      version: '7.1.2'
+      sourceRef:
+        kind: HelmRepository
+        name: dockerhub
+      interval: 5m
+  releaseName: external-dns
+  targetNamespace: ingress
+  values:
+    resources:
+      requests:
+        cpu: 1m
+        memory: 50Mi
+      limits:
+        memory: 50Mi
+    provider: cloudflare
+    # TODO: magicvar(config)
+    txtOwnerId: ""
+    cloudflare:
+      # TODO: magicvar(secret)
+      apiToken: ""
+      proxied: false

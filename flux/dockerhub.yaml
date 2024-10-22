@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: dockerhub
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: oci://registry-1.docker.io
+  type: 'oci'
