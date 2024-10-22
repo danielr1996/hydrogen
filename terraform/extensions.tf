@@ -38,6 +38,7 @@ locals {
                           recurseSubmodules: true
                       kustomization:
                         spec:
+                          suspend: ${var.values.flux.suspend}
                           path: ${var.values.flux.path}
           EOF
         },

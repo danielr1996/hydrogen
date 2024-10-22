@@ -17,6 +17,7 @@ variable "values" {
       url = string
       branch = string
       path = string
+      suspend = bool
     })
   })
 }
