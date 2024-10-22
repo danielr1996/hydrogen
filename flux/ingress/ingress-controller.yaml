@@ -25,6 +25,8 @@ spec:
         kind: HelmRepository
         name: ingress-nginx
       interval: 5m
+  install:
+    createNamespace: true
   releaseName: ingress-nginx
   targetNamespace: ingress
   values:
