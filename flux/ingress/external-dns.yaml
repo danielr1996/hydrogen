@@ -26,8 +26,8 @@ spec:
         memory: 50Mi
     provider: cloudflare
     # TODO: magicvar(config)
-    txtOwnerId: ""
+    txtOwnerId: "CHANGEME"
     cloudflare:
       # TODO: magicvar(secret)
-      apiToken: ""
+      apiToken: "CHANGEME"
       proxied: false

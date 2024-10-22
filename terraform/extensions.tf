@@ -35,6 +35,7 @@ locals {
                           url: ${var.values.flux.url}
                           ref:
                             branch: ${var.values.flux.branch}
+                          recurseSubmodules: true
                       kustomization:
                         spec:
                           path: ${var.values.flux.path}
