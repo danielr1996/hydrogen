@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: hydrogen
+  namespace: flux-system
+spec:
+  interval: 30s
+  url: https://github.com/danielr1996/hydrogen
+  ref:
+    branch: main
