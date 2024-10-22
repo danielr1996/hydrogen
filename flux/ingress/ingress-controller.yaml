@@ -29,6 +29,7 @@ spec:
     createNamespace: true
   releaseName: ingress-nginx
   targetNamespace: ingress
+  storageNamespace: ingress
   values:
     controller:
       #      allowSnippetAnnotations: true

@@ -19,6 +19,7 @@ spec:
     createNamespace: true
   releaseName: external-dns
   targetNamespace: ingress
+  storageNamespace: ingress
   values:
     resources:
       requests:
