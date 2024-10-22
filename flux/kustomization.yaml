@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
 - dockerhub.yaml
 - ghcr.io.yaml
+- hydrogen.yaml
 - ingress/external-dns.yaml
 - ingress/ingress-controller.yaml
