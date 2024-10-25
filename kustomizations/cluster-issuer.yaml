@@ -5,7 +5,7 @@ metadata:
 spec:
   acme:
     # TODO: magicvar(config)
-    email: CHANGEME
+    email: ${CERT_MANAGER_EMAIL}
     privateKeySecretRef:
       name: letsencrypt-staging-private-key
     server: https://acme-staging-v02.api.letsencrypt.org/directory
@@ -20,7 +20,7 @@ metadata:
 spec:
   acme:
     # TODO: magicvar(config)
-    email: CHANGEME
+    email: ${CERT_MANAGER_EMAIL}
     privateKeySecretRef:
       name: letsencrypt-prod-private-key
     server: https://acme-v02.api.letsencrypt.org/directory
