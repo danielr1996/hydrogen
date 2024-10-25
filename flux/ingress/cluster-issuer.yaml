@@ -10,7 +10,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux2-sync
-  healthChecks:
+#  healthChecks:
 #    - apiVersion: helm.toolkit.fluxcd.io/v2
 #      kind: HelmRelease
 #      name: cert-manager
