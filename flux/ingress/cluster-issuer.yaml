@@ -9,7 +9,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: flux2-sync
+    name: hydrogen
 #  healthChecks:
 #    - apiVersion: helm.toolkit.fluxcd.io/v2
 #      kind: HelmRelease
