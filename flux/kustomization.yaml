@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
 - ingress/external-dns.yaml
 - ingress/ingress-controller.yaml
+- ingress/cert-manager.yaml
+- ingress/cluster-issuer.yaml
 - sources/dockerhub.yaml
 - sources/ghcr.io.yaml
 - sources/hydrogen.yaml
