@@ -17,9 +17,9 @@ spec:
       interval: 5m
   install:
     createNamespace: true
-  releaseName: external-dns
   targetNamespace: ingress
   storageNamespace: ingress
+  releaseName: external-dns
   values:
     resources:
       requests:
