@@ -1,0 +1,29 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: olm
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    semver: "= v0.29.0"
+  url: https://github.com/operator-framework/operator-lifecycle-manager.git
+  ignore: |
+    /*
+    !/deploy/chart/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: olm
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  chart:
+    spec:
+      chart: ./deploy/chart/
+      sourceRef:
+        kind: GitRepository
+        name: olm
+        namespace: flux-system
+      interval: 1m
