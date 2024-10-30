@@ -35,6 +35,11 @@ locals {
 #              }
             }
             api = {
+              extraArgs = {
+                oidc-issuer-url: "https://login.homelab.danielrichter.codes/realms/homelab"
+                oidc-client-id: "kubernetes"
+                oidc-username-claim: "email"
+              }
               #              externalAddress = hcloud_load_balancer.controller.ipv4,
               #              sans= [hcloud_load_balancer.controller.ipv4]
             },
