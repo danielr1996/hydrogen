@@ -7,7 +7,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      chart: keycloak
+      chart: bitnamicharts/keycloak
       version: '24.0.1'
       sourceRef:
         kind: HelmRepository
