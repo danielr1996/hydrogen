@@ -11,5 +11,5 @@ provider "keycloak" {
   client_id = "admin-cli"
   username  = var.values.username
   password  = var.values.password
-  url       = var.values.url
+  url       = "${var.values.url}${var.values.url}"
 }
