@@ -1,0 +1,18 @@
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: keycloak
+  namespace: flux-system
+spec:
+  interval: 1m
+  approvePlan: auto
+  destroyResourcesOnDeletion: true
+  path: ./flux/keycloak/terraform
+  sourceRef:
+    kind: GitRepository
+    name: hydrogen
+    namespace: flux-system
+  values:
+    username: ${KEYCLOAK_USERNAME}
+    password: ${KEYCLOAK_PASSWORD}
+    url: ${KEYCLOAK_HOSTNAME}
