@@ -52,7 +52,7 @@ spec:
           # TODO: magicvar(config)
 #          load-balancer.hetzner.cloud/hostname: "CHANGEME"
           # TODO: magicvar(config)
-          external-dns.alpha.kubernetes.io/hostname: ${INGRESS_SERVICE_HOSTNAME}
+          external-dns.alpha.kubernetes.io/hostname: ${INGRESS_CONTROLLER_SERVICE_HOSTNAME}
       ingressClassResource:
         name: 'nginx'
         default: true

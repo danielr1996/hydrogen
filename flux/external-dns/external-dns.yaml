@@ -29,8 +29,8 @@ spec:
         memory: 50Mi
     provider: cloudflare
     # TODO: magicvar(config)
-    txtOwnerId: ${EXTERNALDNS_TXTOWNERID}
+    txtOwnerId: ${EXTERNAL_DNS_TXTOWNERID}
     cloudflare:
       # TODO: magicvar(secret)
-      apiToken: ${EXTERNALDNS_CF_TOKEN}
+      apiToken: ${EXTERNAL_DNS_CF_TOKEN}
       proxied: false
