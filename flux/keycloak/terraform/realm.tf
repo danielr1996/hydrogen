@@ -1,8 +1,8 @@
 resource "keycloak_realm" "default" {
   realm             = "default"
   enabled           = true
-  display_name      = var.values.realm
-  display_name_html = var.values.realm
+  display_name      = "Default"
+  display_name_html = "Default"
   login_theme       = "keycloak"
 
   # TODO: mail doesnt work
