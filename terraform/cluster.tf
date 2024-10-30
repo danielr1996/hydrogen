@@ -95,6 +95,7 @@ resource "terraform_data" "cluster" {
       k0sctl apply
       %{ if var.writekubeconfig}
       k0sctl kubeconfig > ~/.kube/${var.values.cluster.name}
+      chmod 600 ~/.kube/${var.values.cluster.name}
       %{ endif }
     EOF
     interpreter = ["sh", "-c"]
