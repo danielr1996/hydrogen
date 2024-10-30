@@ -1,0 +1,84 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: flux-system
+spec:
+  interval: 10m
+  timeout: 5m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: '65.5.1'
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+      interval: 5m
+  install:
+    createNamespace: true
+  releaseName: kube-prometheus-stack
+  targetNamespace: kube-prometheus-stack
+  storageNamespace: kube-prometheus-stack
+  values:
+    prometheus:
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 10Gi
+        #    selector: {}
+    #        resources:
+    #          requests:
+    #            memory: 400Mi
+    #          limits:
+    #            memory: 800Mi
+    alertmanager:
+      enabled: false
+      ingress:
+        enabled: false
+        ingressClassName: nginx
+        hosts: [ "alertmanager.skynet.danielrichter.codes" ]
+    grafana:
+      enabled: false
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        hosts: ["grafana.skynet.danielrichter.codes"]
+        tls:
+          - secretName: "grafana.skynet.danielrichter.codes"
+            hosts:
+              - "grafana.skynet.danielrichter.codes"
+      persistence:
+        enabled: true
+        type: sts
+        accessModes:
+          - ReadWriteOnce
+        size: 40Gi
+        finalizers:
+          - kubernetes.io/pvc-protection
+      sidecar:
+        dashboards:
+          enableNewTablePanelSyntax: true
+
+
