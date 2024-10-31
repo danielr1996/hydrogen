@@ -1,0 +1,24 @@
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: grafana-oidc-client
+  namespace: grafana
+spec:
+  interval: 1m
+  approvePlan: auto
+  destroyResourcesOnDeletion: true
+  path: ./flux/grafana-oidc-client/terraform
+  sourceRef:
+    kind: GitRepository
+    name: hydrogen
+    namespace: flux-system
+  writeOutputsToSecret:
+    name: grafana-client-credentials
+  values:
+    grafana:
+      url: ${GRAFANA_HOSTNAME}
+    keycloak:
+      username: ${KEYCLOAK_USERNAME}
+      password: ${KEYCLOAK_PASSWORD}
+      url: ${KEYCLOAK_HOSTNAME}
+      scheme: ${KEYCLOAK_SCHEME:=https://}
