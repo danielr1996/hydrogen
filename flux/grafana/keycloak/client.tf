@@ -5,21 +5,19 @@ data keycloak_realm "default" {
 resource "keycloak_openid_client" "openid_client" {
   realm_id              = data.keycloak_realm.default.id
   client_id             = "grafana"
-  name                  = "grafana"
+  name                  = "Grafana"
   access_type           = "CONFIDENTIAL"
   standard_flow_enabled = true
   implicit_flow_enabled = false
   direct_access_grants_enabled = true
-  root_url = var.values.url
-  admin_url = var.values.url
-  web_origins = [var.values.url]
-  base_url = var.values.url
+  root_url = var.values.grafana.url
+  web_origins = ["+"]
   valid_redirect_uris   = [
-    "${var.values.grafana.url}/login/generic_oauth",
+    "/login/generic_oauth",
     "https://oauth.pstmn.io/v1/callback"
   ]
   valid_post_logout_redirect_uris = [
-    "${var.values.grafana.url}/login"
+    "/login"
   ]
 }
 
