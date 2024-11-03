@@ -35,13 +35,6 @@ spec:
       hostname: ${KEYCLOAK_HOSTNAME}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
-      extraHosts:
-        - name: ${KEYCLOAK_HOSTNAME}
-          path: /
-      extraTls:
-        - secretName: ${KEYCLOAK_HOSTNAME}
-          hosts:
-            - ${KEYCLOAK_HOSTNAME}
     auth:
       adminUser: ${KEYCLOAK_USERNAME}
       adminPassword: ${KEYCLOAK_PASSWORD}
