@@ -10,7 +10,7 @@ resource "keycloak_openid_client" "openid_client" {
   standard_flow_enabled = true
   implicit_flow_enabled = false
   direct_access_grants_enabled = true
-  root_url = var.values.grafana.url
+  root_url = "${var.values.grafana.scheme}${var.values.grafana.hostname}"
   web_origins = ["+"]
   valid_redirect_uris   = [
     "/login/generic_oauth",

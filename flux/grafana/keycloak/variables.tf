@@ -3,11 +3,12 @@ variable "values" {
     keycloak = object({
       username = string
       password = string
-      url = string
+      hostname = string
       scheme = string
     })
     grafana = object({
-      url = string
+      hostname = string
+      scheme = string
     })
   })
 }

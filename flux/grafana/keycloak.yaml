@@ -1,0 +1,39 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tf-runner-rolebinding
+  namespace: grafana
+subjects:
+  - kind: ServiceAccount
+    name: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tf-runner-role
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: grafana-oidc-client
+  namespace: grafana
+spec:
+  serviceAccountName: default
+  interval: 1m
+  approvePlan: auto
+  destroyResourcesOnDeletion: true
+  path: ./flux/grafana/keycloak
+  sourceRef:
+    kind: GitRepository
+    name: hydrogen
+    namespace: flux-system
+  writeOutputsToSecret:
+    name: grafana-client-credentials
+  values:
+    grafana:
+      hostname: ${GRAFANA_HOSTNAME}
+      scheme: ${GRAFANA_SCHEME:=https://}
+    keycloak:
+      username: ${KEYCLOAK_USERNAME}
+      password: ${KEYCLOAK_PASSWORD}
+      hostname: ${KEYCLOAK_HOSTNAME}
+      scheme: ${KEYCLOAK_SCHEME:=https://}
