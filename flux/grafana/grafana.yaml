@@ -6,6 +6,13 @@ metadata:
   labels:
     dashboards: "grafana"
 spec:
+  persistentVolumeClaim:
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
   config:
     server:
       root_url: ${GRAFANA_SCHEME:=https://}${GRAFANA_HOSTNAME}
@@ -42,6 +49,9 @@ spec:
         spec:
           containers:
             - name: grafana
+              securityContext:
+                allowPrivilegeEscalation: true
+                readOnlyRootFilesystem: false
               env:
                 - name: OAUTH_CLIENT_ID
                   valueFrom:
@@ -78,15 +88,3 @@ spec:
         - hosts:
             - ${GRAFANA_HOSTNAME}
           secretName: ${GRAFANA_HOSTNAME}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: grafana-pvc
-  namespace: grafana
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
