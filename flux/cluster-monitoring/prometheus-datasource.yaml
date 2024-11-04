@@ -1,0 +1,17 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: cluster-monitoring
+  namespace: cluster-monitoring
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    name: cluster-monitoring
+    type: prometheus
+    access: proxy
+#    basicAuth: true
+    url: http://prometheus-operated.cluster-monitoring:9090
+    isDefault: true
