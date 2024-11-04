@@ -36,7 +36,7 @@ locals {
             }
             api = {
               extraArgs = {
-                oidc-issuer-url: "https://login.homelab.danielrichter.codes/realms/homelab"
+                oidc-issuer-url: "https://auth.homelab.danielrichter.codes/realms/homelab"
                 oidc-client-id: "kubernetes"
                 oidc-username-claim: "email"
               }
