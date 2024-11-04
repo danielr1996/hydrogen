@@ -16,8 +16,8 @@ spec:
       interval: 5m
   install:
     createNamespace: true
-  targetNamespace: cluster-monitoring
-  storageNamespace: cluster-monitoring
+  targetNamespace: monitoring
+  storageNamespace: monitoring
   releaseName: alloy
   values:
     alloy:
@@ -32,16 +32,16 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: alloy-settings
-  namespace: cluster-monitoring
+  namespace: monitoring
 type: Opaque
 stringData:
-  host: "http://loki-gateway.cluster-monitoring"
+  host: "http://loki-gateway.monitoring"
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: alloy-config
-  namespace: cluster-monitoring
+  namespace: monitoring
 data:
   events.config.alloy: |-
     loki.write "default" {
@@ -195,7 +195,7 @@ data:
     // Logs Service
     remote.kubernetes.secret "logs_service" {
       name = "alloy-settings"
-      namespace = "cluster-monitoring"
+      namespace = "monitoring"
     }
 
     loki.process "logs_service" {

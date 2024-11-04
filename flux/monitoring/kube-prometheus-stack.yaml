@@ -25,9 +25,9 @@ spec:
       interval: 5m
   install:
     createNamespace: true
-  releaseName: cluster-monitoring
-  targetNamespace: cluster-monitoring
-  storageNamespace: cluster-monitoring
+  releaseName: kube-prometheus-stack
+  targetNamespace: monitoring
+  storageNamespace: monitoring
   values:
     kube-state-metrics:
       fullnameOverride: "kube-state-metrics"
