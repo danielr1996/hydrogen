@@ -17,6 +17,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: logs
+  namespace: monitoring
 data:
   dashboard.json: |
     {
