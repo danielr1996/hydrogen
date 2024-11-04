@@ -99,7 +99,7 @@ data:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "cluster-monitoring"
+              "uid": "prometheus"
             },
             "definition": "label_values(namespace)",
             "hide": 0,
@@ -130,7 +130,7 @@ data:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "cluster-monitoring"
+              "uid": "prometheus"
             },
             "definition": "label_values({namespace=~\"$namespace\"},pod)",
             "hide": 0,
@@ -157,7 +157,7 @@ data:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "cluster-monitoring"
+              "uid": "prometheus"
             },
             "definition": "label_values({pod=~\"$pod\"},container)",
             "hide": 0,

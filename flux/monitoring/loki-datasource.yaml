@@ -2,7 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: loki
-  namespace: cluster-monitoring
+  namespace: monitoring
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -13,4 +13,4 @@ spec:
     type: loki
     access: proxy
 #    basicAuth: true
-    url: http://loki-gateway.cluster-monitoring
+    url: http://loki-gateway.monitoring

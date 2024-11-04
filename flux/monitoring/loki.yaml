@@ -16,8 +16,8 @@ spec:
       interval: 5m
   install:
     createNamespace: true
-  targetNamespace: cluster-monitoring
-  storageNamespace: cluster-monitoring
+  targetNamespace: monitoring
+  storageNamespace: monitoring
   releaseName: loki
   values:
     deploymentMode: SingleBinary
