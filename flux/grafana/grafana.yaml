@@ -6,6 +6,7 @@ metadata:
   labels:
     dashboards: "grafana"
 spec:
+  version: 11.3.0
   persistentVolumeClaim:
     spec:
       accessModes:
@@ -47,11 +48,10 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            fsGroup: 10001
           containers:
             - name: grafana
-              securityContext:
-                allowPrivilegeEscalation: true
-                readOnlyRootFilesystem: false
               env:
                 - name: OAUTH_CLIENT_ID
                   valueFrom:
