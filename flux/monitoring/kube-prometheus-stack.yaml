@@ -43,7 +43,7 @@ spec:
               resources:
                 requests:
                   storage: 10Gi
-    alertmanager:
-      enabled: false
+#    alertmanager:
+#      enabled: true
     grafana:
       enabled: false
