@@ -1,0 +1,17 @@
+apiVersion: v2
+type: application
+name: paperlessngx
+version: 2.4.3
+appVersion: 2.10.2
+description: A Helm chart for Kubernetes
+dependencies:
+  - name: postgresql
+    condition: postgresql.enabled
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 15.5.14
+    tags:
+      - persistence
+  - name: redis
+    condition: redis.enabled
+    repository: https://huangchengwu.github.io/helm-chart/chart
+    version: 14.2.10

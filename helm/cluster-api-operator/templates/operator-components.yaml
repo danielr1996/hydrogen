@@ -1,0 +1,470 @@
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-manager
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-leader-election-role
+  namespace: '{{ .Release.Namespace }}'
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-manager-role
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-leader-election-rolebinding
+  namespace: '{{ .Release.Namespace }}'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: capi-operator-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: capi-operator-manager
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-manager-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: capi-operator-manager-role
+subjects:
+- kind: ServiceAccount
+  name: capi-operator-manager
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-webhook-service
+  namespace: '{{ .Release.Namespace }}'
+spec:
+  ports:
+  - port: 443
+    targetPort: 9443
+  selector:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+    control-plane: controller-manager
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-serving-cert
+  namespace: '{{ .Release.Namespace }}'
+spec:
+  dnsNames:
+  - capi-operator-webhook-service.{{ .Release.Namespace }}.svc
+  - capi-operator-webhook-service.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: capi-operator-selfsigned-issuer
+  secretName: capi-operator-webhook-service-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-selfsigned-issuer
+  namespace: '{{ .Release.Namespace }}'
+spec:
+  selfSigned: {}
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/capi-operator-serving-cert'
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-mutating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-addonprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vaddonprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - addonproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-bootstrapprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vbootstrapprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - bootstrapproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-controlplaneprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vcontrolplaneprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - controlplaneproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-coreprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vcoreprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - coreproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-infrastructureprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vinfrastructureprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - infrastructureproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-ipamprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vipamprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ipamproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-operator-cluster-x-k8s-io-v1alpha2-runtimeextensionprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vruntimeextensionprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - runtimeextensionproviders
+  sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/capi-operator-serving-cert'
+  labels:
+    clusterctl.cluster.x-k8s.io/core: capi-operator
+  name: capi-operator-validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-addonprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vaddonprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - addonproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-bootstrapprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vbootstrapprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - bootstrapproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-controlplaneprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vcontrolplaneprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - controlplaneproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-coreprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vcoreprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - coreproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-infrastructureprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vinfrastructureprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - infrastructureproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-ipamprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vipamprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ipamproviders
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: capi-operator-webhook-service
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-operator-cluster-x-k8s-io-v1alpha2-runtimeextensionprovider
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: vruntimeextensionprovider.kb.io
+  rules:
+  - apiGroups:
+    - operator.cluster.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - runtimeextensionproviders
+  sideEffects: None

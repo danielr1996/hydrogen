@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "paperlessngx.fullname" . }}
+  labels:
+    {{- include "paperlessngx.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "paperlessngx.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "paperlessngx.selectorLabels" . | nindent 8 }}
+    spec:
+      enableServiceLinks: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              subPath: data
+              mountPath: /usr/src/paperless/data
+            - name: data
+              subPath: media
+              mountPath: /usr/src/paperless/media
+            - name: export
+              mountPath: /usr/src/paperless/export
+            - name: consume
+              mountPath: /usr/src/paperless/consume
+          envFrom:
+            - secretRef:
+                name: {{ include "paperlessngx.fullname" . }}-credentials
+            - configMapRef:
+                name: {{ include "paperlessngx.fullname" . }}-config
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 6
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      initContainers:
+        {{- if .Values.backup.enabled }}
+        - name: restic-backup
+          restartPolicy: Always
+          image: mazzolino/restic:1.7.2
+          volumeMounts:
+            - name: export
+              mountPath: /data
+          env:
+            - name: BACKUP_CRON
+              value: "15-45/30 * * * *"
+            - name: RESTIC_BACKUP_ARGS
+              value: "--host {{ include "paperlessngx.fullname" . }} --tag helm.sh/chart={{ .Chart.Name}} --tag helm.sh/appversion={{ .Values.image.tag | default .Chart.AppVersion }}"
+          envFrom:
+            - configMapRef:
+                name: {{ include "paperlessngx.fullname" . }}-restic-config
+            - secretRef:
+                name: {{ include "paperlessngx.fullname" . }}-restic-credentials
+        {{- end }}
+        {{- if .Values.restore.enabled }}
+        - name: restic-restore
+          image: restic/restic:0.16.5
+          command:
+            - "restic"
+            - "restore"
+            - "{{ .Values.restore.from.version | default "latest" }}:/data"
+            - "--target"
+            - "/usr/src/paperless/export"
+            - "--host"
+            - {{ .Values.restore.from.host | default (include "paperlessngx.fullname" . ) | quote }}
+            - "--tag"
+            - "helm.sh/chart={{ .Chart.Name}}"
+            - "--tag"
+            - "helm.sh/appversion={{ .Values.image.tag | default .Chart.AppVersion }}"
+          volumeMounts:
+            - name: export
+              mountPath: /usr/src/paperless/export
+          envFrom:
+            - configMapRef:
+                name: {{ include "paperlessngx.fullname" . }}-restic-config
+            - secretRef:
+                name: {{ include "paperlessngx.fullname" . }}-restic-credentials
+        - name: paperless-import
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          args:
+            - "/usr/bin/bash"
+            - "-c"
+            - |
+              if [ -f /usr/src/paperless/lock/lockfile ]; then
+                echo "Importlock detected at /usr/src/paperless/lock/lockfile, this means you already ran a restore on this instance.";
+              else
+                document_importer /usr/src/paperless/export;
+                touch /usr/src/paperless/lock/lockfile;
+              fi
+          volumeMounts:
+            - name: export
+              mountPath: /usr/src/paperless/export
+            - name: data
+              subPath: data
+              mountPath: /usr/src/paperless/data
+            - name: data
+              subPath: media
+              mountPath: /usr/src/paperless/media
+            - name: data
+              subPath: lock
+              mountPath: /usr/src/paperless/lock
+          envFrom:
+            - configMapRef:
+                name: {{ include "paperlessngx.fullname" . }}-config
+            - secretRef:
+                name: {{ include "paperlessngx.fullname" . }}-credentials
+        {{- end }}
+      volumes:
+        {{- if not .Values.storage.enabled }}
+        - name: data
+          emptyDir: { }
+        {{- end }}
+        - name: consume
+          emptyDir: { }
+        - name: export
+          emptyDir: { }
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Delete
+    whenScaled: Retain
+  {{- if .Values.storage.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: {{ .Values.storage.size }}
+  {{- end }}
