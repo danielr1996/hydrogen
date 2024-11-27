@@ -4,3 +4,6 @@ metadata:
   name: cluster-api
 spec:
   version: v1.8.5
+  manager:
+    featureGates:
+      ClusterTopology: true
