@@ -1,0 +1,7 @@
+core: ""
+bootstrap: ""
+controlPlane: ""
+infrastructure: ""
+addon: ""
+manager.featureGates: {}
+configSecret: {}

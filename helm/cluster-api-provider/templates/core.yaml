@@ -5,7 +5,6 @@
 {{- $coreVersion := "" }}
 {{- $coreNamespace := "" }}
 {{- $coreName := "" }}
-{{- $coreVersion := "" }}
 {{-  if eq $coreArgsLen 3 }}
   {{- $coreNamespace = $coreArgs._0 }}
   {{- $coreName = $coreArgs._1 }}
@@ -24,9 +23,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  annotations:
-    "helm.sh/hook": "post-install,post-upgrade"
-    "helm.sh/hook-weight": "1"
   name: {{ $coreNamespace }}
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
@@ -34,10 +30,6 @@ kind: CoreProvider
 metadata:
   name: {{ $coreName }}
   namespace: {{ $coreNamespace }}
-  annotations:
-    "helm.sh/hook": "post-install,post-upgrade"
-    "helm.sh/hook-weight": "2"
-    "argocd.argoproj.io/sync-wave": "2"
 {{- if or $coreVersion $.Values.configSecret.name }}
 spec:
 {{- end}}
